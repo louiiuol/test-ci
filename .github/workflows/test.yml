@@ -27,13 +27,19 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-
-    - name: Read JSON and export value
-      id: extract_json
+    - name: Read from first JSON file and export value
+      id: extract_json_1
       run: |
-        JSON_VALUE=$(jq -r '.text' info.json)
-        echo "MY_ENV_VAR=${JSON_VALUE}" >> $GITHUB_ENV
+        MARKETPLACE=$(jq -r '.text' marketplace.json)
+        echo "MARKETPLACE=${MARKETPLACE}" >> $GITHUB_ENV
 
-    - name: Use the exported value
+    - name: Read from second JSON file and export value
+      id: extract_json_2
       run: |
-          echo "The value is: ${{ env.MY_ENV_VAR }}"
+        VALUE2=$(jq -r '.text' showcase.json)
+        echo "SHOWCASE=${VALUE2}" >> $GITHUB_ENV
+
+    - name: Use the exported values
+      run: |
+        echo "The first value is: ${{ env.MARKETPLACE }}"
+        echo "The second value is: ${{ env.SHOWCASE }}"
