@@ -1,0 +1,39 @@
+name: Deploy to Netlify [PROD]
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  actions: read # Needed for nx-set-shas when run on the main branch
+  contents: read # Needed for nx-set-shas when run on the main branch
+  pull-requests: write # Needed to create a comment on the PR
+
+jobs:
+  deploy-production:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        cache: "npm"
+        cache-dependency-path: "package-lock.json"
+
+    - name: Install dependencies
+      run: npm ci
+
+
+    - name: Read JSON and export value
+      id: extract_json
+      run: |
+        JSON_VALUE=$(jq -r '.text' info.json)
+        echo "MY_ENV_VAR=${JSON_VALUE}" >> $GITHUB_ENV
+
+    - name: Use the exported value
+      run: |
+          echo "The value is: ${{ env.MY_ENV_VAR }}"
